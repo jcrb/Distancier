@@ -1,0 +1,59 @@
+---
+title: "demo"
+author: "JcB"
+date: "07/09/2014"
+output: html_document
+---
+
+source: http://rgeomatic.hypotheses.org/157
+
+```{r}
+
+# librairies
+library(RCurl)
+library(RJSONIO)
+
+# import de données
+dataOrig<-read.csv("ville2.csv",sep=",")
+dataDest<-read.csv("ville2.csv",sep=",")
+
+# nombre d'origines et de destination
+dOrig<-dim(dataOrig)[1]
+dDest<-dim(dataDest)[1]
+
+# creation de la matrice vide
+req <-matrix(nrow=dOrig,ncol=dDest, dimnames=list(dataOrig$NOM,dataDest$NOM))
+
+# création de la matrice des requêtes à envoyer
+for (i in 1:dOrig){
+  for (j in 1:dDest){
+    req[i,j] <- paste("http://localhost:8989/route?point=",
+                    paste(dataOrig$Y[i],dataOrig$X[i],sep=","),"&point=",
+                    paste(dataDest$Y[j],dataDest$X[j],sep=","),
+                    "&locale=fr&instructions=false&calc_points=false",sep="")
+  }
+}
+
+# reception des requêtes
+result<-apply(X=req,c(1,2),function(x) {try(getURL(URLencode(x) ),silent=TRUE)})
+
+# fonction de parsage des réponses 
+decode<-function(x){
+  if (class(x)=="character"){
+  # décodage du résultat de la requête
+    if (length(fromJSON(x)$paths[[1]]>0)){
+       fromJSON(x)$paths[[1]][1] # pour le temps
+       # fromJSON(x)$paths[[1]][2] # pour la distance (mètres)
+    } else {
+      NA
+    }
+  } else {
+    NA
+  }
+}
+mat<-apply(X=result,c(1,2), decode)
+
+# passage des milliseconde en minutes
+mat<-round(mat/(1000*60),0)
+mat
+```
