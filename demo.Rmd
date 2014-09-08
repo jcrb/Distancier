@@ -38,22 +38,43 @@ for (i in 1:dOrig){
 result<-apply(X=req,c(1,2),function(x) {try(getURL(URLencode(x) ),silent=TRUE)})
 
 # fonction de parsage des réponses 
-decode<-function(x){
-  if (class(x)=="character"){
-  # décodage du résultat de la requête
-    if (length(fromJSON(x)$paths[[1]]>0)){
-       fromJSON(x)$paths[[1]][1] # pour le temps
-       # fromJSON(x)$paths[[1]][2] # pour la distance (mètres)
-    } else {
-      NA
-    }
-  } else {
-    NA
-  }
-}
-mat<-apply(X=result,c(1,2), decode)
+
+source("distancier.R")
+
+mat<-apply(X=result,c(1,2), decode.temps)
 
 # passage des milliseconde en minutes
 mat<-round(mat/(1000*60),0)
 mat
+
+mat2<-apply(X=result,c(1,2), decode.distance)
+mat2 <- round(mat2/1000,1)
+mat2
 ```
+
+Distance entre HTP et le CH Haguenau:
+
+```{r}
+source("distancier.R")
+x1 <- 7.70714690 # HTP
+y1 <- 48.59323950
+x2 <- 7.77857800 # CH Haguenau
+y2 <- 48.79733580
+req1 <- paste("http://localhost:8989/route?point=", paste(y1, x1, sep=","), "&point=", paste(y2, x2, sep=","), "&locale=fr&instructions=false&calc_points=false",sep="")
+t <- decode.temps(req1)
+round(t/(1000*60), 0)
+t <- decode.distance(req1)
+t
+```
+
+Pour trouver des coordonnées manquantes:
+```{}
+library("ggmap")
+geocode("Nouvel Hôpital Civil")
+
+```
+Information from URL : http://maps.googleapis.com/maps/api/geocode/json?address=Nouvel+H%c3%b4pital+Civil&sensor=false
+Google Maps API Terms of Service : http://developers.google.com/maps/terms
+       lon      lat
+1 7.742367 48.57501
+

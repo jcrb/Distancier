@@ -96,3 +96,16 @@ http://localhost:8989/route?point=
 et non 
 http://localhost:8989/api/route?point=
 ```
+
+5. Utiisation pratique
+-----------------------
+
+1. se placer dans le répertoire de graphhoper   
+2. lancer le serveur  
+
+```{}
+cd ~/Documents/Resural/DISTANCIER/graphhopper
+./graphhopper.sh web alsace-lorraine.osm
+```
+
+3. lancer le programme demo.rmd

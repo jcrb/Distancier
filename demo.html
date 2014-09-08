@@ -91,27 +91,337 @@ for (i in 1:dOrig){
 result&lt;-apply(X=req,c(1,2),function(x) {try(getURL(URLencode(x) ),silent=TRUE)})
 
 # fonction de parsage des réponses 
-decode&lt;-function(x){
-  if (class(x)==&quot;character&quot;){
-  # décodage du résultat de la requête
-    if (length(fromJSON(x)$paths[[1]]&gt;0)){
-       fromJSON(x)$paths[[1]][1]
-    } else {
-      NA
-    }
-  } else {
-    NA
-  }
-}
-mat&lt;-apply(X=result,c(1,2), decode)
+
+source(&quot;distancier.R&quot;)
+
+mat&lt;-apply(X=result,c(1,2), decode.temps)
 
 # passage des milliseconde en minutes
 mat&lt;-round(mat/(1000*60),0)
 mat</code></pre>
-<pre><code>##        Nancy Metz Epinal
-## Nancy      0   38     53
-## Metz      39    0     89
-## Epinal    53   88      0</code></pre>
+<pre><code>##                      CHU de Nancy-Brabois CHU de Nancy Nancy
+## CHU de Nancy-Brabois                    0           10    12
+## CHU de Nancy                           10            0     4
+## Nancy                                  11            4     0
+## Hôpital de Mercy                       43           39    37
+## Metz                                   45           41    39
+## Epinal                                 50           51    53
+## SteAnne                               101          102   105
+## HTP                                   100          101   104
+## NHC                                   100          101   104
+## SteOdile                              101          103   106
+## CH Haguenau                            95           96    99
+## CH Wissembourg                        125          127   129
+## CH Saverne                             74           75    78
+## CH Selestat                           103          104   107
+## StLuc                                  83           85    87
+## CH Colmar                             119          120   123
+## CH Guebwiller                         135          136   139
+## CH Thann                              125          126   129
+## CH Altkirch                           152          153   156
+## CH Mulhouse                           143          145   147
+## 3Frontières                           151          153   155
+## Diaconat-Fonderie                     141          143   145
+## CH Epinal                              50           51    54
+## CH St Dié                              65           66    69
+##                      Hôpital de Mercy Metz Epinal SteAnne HTP NHC SteOdile
+## CHU de Nancy-Brabois               42   43     51     103 101 102      103
+## CHU de Nancy                       38   40     51     104 102 102      104
+## Nancy                              36   38     53     106 104 104      106
+## Hôpital de Mercy                    0    3     88     105 103 103      105
+## Metz                                4    0     89     105 103 104      106
+## Epinal                             86   88      0     123 119 117      116
+## SteAnne                           104  104    124       0   9   9        9
+## HTP                               103  103    119       9   0   5        7
+## NHC                               103  103    118       8   5   0        3
+## SteOdile                          105  105    118       9   7   3        0
+## CH Haguenau                        98   98    123      27  26  26       28
+## CH Wissembourg                    128  128    153      56  56  56       58
+## CH Saverne                         79   79    101      38  34  36       38
+## CH Selestat                       128  128     88      41  37  35       35
+## StLuc                             120  121     82      44  40  38       38
+## CH Colmar                         143  144     87      56  52  50       50
+## CH Guebwiller                     161  161     96      73  69  67       67
+## CH Thann                          162  163     79      85  81  79       79
+## CH Altkirch                       181  181    106      94  90  88       87
+## CH Mulhouse                       168  168    101      81  77  75       75
+## 3Frontières                       176  176    116      89  85  83       83
+## Diaconat-Fonderie                 166  166     97      79  75  73       73
+## CH Epinal                          87   88      1     123 119 117      116
+## CH St Dié                         101  103     49      76  72  70       70
+##                      CH Haguenau CH Wissembourg CH Saverne CH Selestat
+## CHU de Nancy-Brabois          97            128         75         102
+## CHU de Nancy                  98            128         76         103
+## Nancy                        100            130         78         105
+## Hôpital de Mercy              99            129         79         128
+## Metz                         100            130         79         128
+## Epinal                       123            154        101          87
+## SteAnne                       27             55         38          42
+## HTP                           26             56         34          37
+## NHC                           26             56         36          36
+## SteOdile                      28             58         38          36
+## CH Haguenau                    0             37         32          58
+## CH Wissembourg                37              0         62          89
+## CH Saverne                    33             63          0          54
+## CH Selestat                   58             88         54           0
+## StLuc                         61             91         48          44
+## CH Colmar                     73            103         70          22
+## CH Guebwiller                 90            120         87          40
+## CH Thann                     102            132         99          52
+## CH Altkirch                  110            141        107          60
+## CH Mulhouse                   98            128         95          47
+## 3Frontières                  106            136        103          55
+## Diaconat-Fonderie             96            126         92          45
+## CH Epinal                    124            154        102          87
+## CH St Dié                     93            123         84          41
+##                      StLuc CH Colmar CH Guebwiller CH Thann CH Altkirch
+## CHU de Nancy-Brabois    84       117           134      126         153
+## CHU de Nancy            85       118           135      127         154
+## Nancy                   87       120           137      129         156
+## Hôpital de Mercy       121       143           161      163         180
+## Metz                   121       143           161      165         181
+## Epinal                  82        87            95       79         106
+## SteAnne                 44        57            75       86          94
+## HTP                     39        52            70       82          90
+## NHC                     39        51            69       81          89
+## SteOdile                38        51            69       80          88
+## CH Haguenau             61        73            91      103         111
+## CH Wissembourg          91       104           122      133         141
+## CH Saverne              47        69            87       99         107
+## CH Selestat             44        23            41       52          60
+## StLuc                    0        60            78       89          97
+## CH Colmar               60         0            22       34          48
+## CH Guebwiller           77        22             0       18          33
+## CH Thann                89        34            19        0          28
+## CH Altkirch             98        49            34       28           0
+## CH Mulhouse             85        36            21       23          18
+## 3Frontières             93        44            35       38          25
+## Diaconat-Fonderie       83        33            17       18          17
+## CH Epinal               83        86            95       78         105
+## CH St Dié               38        56            73       74          94
+##                      CH Mulhouse 3Frontières Diaconat-Fonderie CH Epinal
+## CHU de Nancy-Brabois         142         151               139        52
+## CHU de Nancy                 143         152               140        53
+## Nancy                        145         154               142        55
+## Hôpital de Mercy             167         176               164        89
+## Metz                         168         177               165        91
+## Epinal                        99         115                95         2
+## SteAnne                       81          90                78       125
+## HTP                           77          86                74       120
+## NHC                           76          85                73       119
+## SteOdile                      75          84                72       119
+## CH Haguenau                   98         107                95       124
+## CH Wissembourg               128         137               125       154
+## CH Saverne                    94         103                91       103
+## CH Selestat                   47          56                44        89
+## StLuc                         84          93                81        83
+## CH Colmar                     35          44                32        87
+## CH Guebwiller                 20          35                17        96
+## CH Thann                      21          37                17        79
+## CH Altkirch                   18          25                17       106
+## CH Mulhouse                    0          25                 5       101
+## 3Frontières                   25           0                23       116
+## Diaconat-Fonderie              5          24                 0        97
+## CH Epinal                     98         114                94         1
+## CH St Dié                     81          90                78        50
+##                      CH St Dié
+## CHU de Nancy-Brabois        64
+## CHU de Nancy                65
+## Nancy                       67
+## Hôpital de Mercy           102
+## Metz                       103
+## Epinal                      49
+## SteAnne                     76
+## HTP                         72
+## NHC                         71
+## SteOdile                    70
+## CH Haguenau                 93
+## CH Wissembourg             123
+## CH Saverne                  83
+## CH Selestat                 41
+## StLuc                       38
+## CH Colmar                   57
+## CH Guebwiller               73
+## CH Thann                    75
+## CH Altkirch                 94
+## CH Mulhouse                 81
+## 3Frontières                 89
+## Diaconat-Fonderie           79
+## CH Epinal                   49
+## CH St Dié                    0</code></pre>
+<pre class="r"><code>mat2&lt;-apply(X=result,c(1,2), decode.distance)
+mat2 &lt;- round(mat2/1000,1)
+mat2</code></pre>
+<pre><code>##                      CHU de Nancy-Brabois CHU de Nancy Nancy
+## CHU de Nancy-Brabois                  0.0          7.8  11.7
+## CHU de Nancy                          7.7          0.0   3.4
+## Nancy                                 8.2          3.8   0.0
+## Hôpital de Mercy                     63.6         57.5  55.0
+## Metz                                 65.3         59.2  56.7
+## Epinal                               66.0         67.9  70.0
+## SteAnne                             153.1        155.5 157.5
+## HTP                                 154.7        157.1 159.1
+## NHC                                 154.5        156.9 158.9
+## SteOdile                            156.7        159.1 161.1
+## CH Haguenau                         142.2        144.6 146.6
+## CH Wissembourg                      174.4        176.7 178.8
+## CH Saverne                          107.4        109.8 111.8
+## CH Selestat                         125.6        128.0 130.0
+## StLuc                                97.9        100.3 102.4
+## CH Colmar                           145.3        147.7 149.7
+## CH Guebwiller                       164.6        167.0 169.0
+## CH Thann                            149.1        151.0 153.0
+## CH Altkirch                         179.0        180.9 183.0
+## CH Mulhouse                         187.5        189.9 192.0
+## 3Frontières                         204.1        206.5 208.6
+## Diaconat-Fonderie                   186.3        188.7 190.7
+## CH Epinal                            66.5         68.4  70.5
+## CH St Dié                            82.4         84.8  86.8
+##                      Hôpital de Mercy  Metz Epinal SteAnne   HTP   NHC
+## CHU de Nancy-Brabois             62.5  63.5   66.0   154.2 154.5 154.7
+## CHU de Nancy                     57.1  58.1   67.6   155.9 156.2 156.4
+## Nancy                            54.1  55.1   69.2   157.5 157.8 158.0
+## Hôpital de Mercy                  0.0   2.6  123.1   164.0 164.3 164.6
+## Metz                              3.8   0.0  124.7   163.9 164.3 164.5
+## Epinal                          122.4 123.4    0.0   149.0 144.4 142.3
+## SteAnne                         163.4 163.1  149.2     0.0   8.2   6.9
+## HTP                             165.0 164.7  144.5     8.1   0.0   4.2
+## NHC                             164.8 164.5  143.1     7.1   4.0   0.0
+## SteOdile                        167.0 166.7  142.2     7.6   6.3   2.3
+## CH Haguenau                     152.5 152.2  144.5    32.1  32.4  32.7
+## CH Wissembourg                  184.7 184.4  176.7    66.8  64.6  64.8
+## CH Saverne                      119.7 119.4  109.8    52.6  37.6  40.3
+## CH Selestat                     186.3 186.0   94.4    57.5  52.9  50.8
+## StLuc                           158.4 159.4   82.3    53.5  48.9  46.8
+## CH Colmar                       209.1 208.8   88.6    80.3  75.8  73.6
+## CH Guebwiller                   233.1 232.8   97.8   104.3  99.7  97.6
+## CH Thann                        205.4 206.5   85.6   122.9 118.3 116.2
+## CH Altkirch                     268.3 268.0  115.6   139.5 135.0 132.8
+## CH Mulhouse                     251.4 251.1  110.3   122.6 118.0 115.9
+## 3Frontières                     268.0 267.7  138.1   139.1 134.6 132.5
+## Diaconat-Fonderie               250.1 249.8  106.6   121.3 116.7 114.6
+## CH Epinal                       122.9 123.9    1.1   149.0 144.4 142.3
+## CH St Dié                       142.8 143.9   50.6    97.2  92.6  90.5
+##                      SteOdile CH Haguenau CH Wissembourg CH Saverne
+## CHU de Nancy-Brabois    156.3       143.8          176.1      108.0
+## CHU de Nancy            158.0       145.5          177.8      109.7
+## Nancy                   159.6       147.2          179.4      111.3
+## Hôpital de Mercy        166.1       153.7          154.8      119.3
+## Metz                    166.0       153.6          154.8      119.2
+## Epinal                  141.6       145.7          177.9      109.8
+## SteAnne                   7.5        31.3           66.7       51.7
+## HTP                       6.2        32.9           65.2       37.7
+## NHC                       2.3        32.7           65.0       40.3
+## SteOdile                  0.0        34.9           67.2       42.6
+## CH Haguenau              34.2         0.0           34.3       40.8
+## CH Wissembourg           66.4        34.2            0.0       73.0
+## CH Saverne               42.3        42.3           74.5        0.0
+## CH Selestat              50.1        81.5          113.8       64.9
+## StLuc                    46.1        77.5          109.8       48.6
+## CH Colmar                73.0       104.3          136.6       87.8
+## CH Guebwiller            96.9       128.3          160.6      111.7
+## CH Thann                115.5       146.9          179.2      130.3
+## CH Altkirch             132.2       163.5          195.8      147.0
+## CH Mulhouse             115.2       146.6          178.8      130.0
+## 3Frontières             131.8       163.2          195.4      146.6
+## Diaconat-Fonderie       114.0       145.3          177.6      128.8
+## CH Epinal               141.6       146.4          178.7      110.6
+## CH St Dié                89.8       121.2          153.4       92.6
+##                      CH Selestat StLuc CH Colmar CH Guebwiller CH Thann
+## CHU de Nancy-Brabois       125.1  98.4     145.2         164.5    149.4
+## CHU de Nancy               126.8 100.1     146.9         166.2    151.0
+## Nancy                      128.4 101.7     148.5         167.8    152.6
+## Hôpital de Mercy           186.6 169.2     208.4         232.9    206.4
+## Metz                       186.5 169.1     208.3         232.9    208.1
+## Epinal                      93.4  82.3      88.5          97.5     85.5
+## SteAnne                     58.8  53.5      80.6         105.1    123.5
+## HTP                         54.1  48.8      75.9         100.4    118.8
+## NHC                         52.7  47.5      74.5          99.0    117.4
+## SteOdile                    51.8  46.5      73.6          98.1    116.4
+## CH Haguenau                 83.0  77.7     104.8         129.3    147.7
+## CH Wissembourg             115.2 109.9     137.0         161.5    179.9
+## CH Saverne                  65.7  48.2      87.4         112.0    130.3
+## CH Selestat                  0.0  43.7      26.2          50.7     69.1
+## StLuc                       43.1   0.0      65.5          90.0    108.4
+## CH Colmar                   26.4  66.1       0.0          26.2     44.6
+## CH Guebwiller               50.4  90.0      26.7           0.0     23.4
+## CH Thann                    69.0 108.7      45.3          24.4      0.0
+## CH Altkirch                 85.6 125.3      63.7          42.4     30.2
+## CH Mulhouse                 68.6 108.3      46.8          25.9     24.8
+## 3Frontières                 85.2 124.9      63.3          51.3     52.7
+## Diaconat-Fonderie           67.4 107.1      43.3          22.1     21.2
+## CH Epinal                   93.4  83.1      87.8          96.8     84.9
+## CH St Dié                   41.6  39.5      61.7          81.0     71.8
+##                      CH Altkirch CH Mulhouse 3Frontières Diaconat-Fonderie
+## CHU de Nancy-Brabois       181.6       188.1       204.7             185.7
+## CHU de Nancy               183.2       189.8       206.4             187.4
+## Nancy                      184.8       191.5       208.1             189.1
+## Hôpital de Mercy           267.9       251.3       267.9             248.9
+## Metz                       267.8       251.2       267.8             248.8
+## Epinal                     117.7       109.9       138.8             106.9
+## SteAnne                    140.1       123.5       140.1             121.1
+## HTP                        135.4       118.8       135.4             116.4
+## NHC                        134.0       117.4       134.0             115.0
+## SteOdile                   133.0       116.5       133.1             114.1
+## CH Haguenau                164.3       147.7       164.3             145.3
+## CH Wissembourg             196.4       179.9       196.5             177.5
+## CH Saverne                 146.9       130.4       147.0             128.0
+## CH Selestat                 85.7        69.1        85.7              66.7
+## StLuc                      125.0       108.4       125.0             106.0
+## CH Colmar                   62.6        46.1        62.7              43.7
+## CH Guebwiller               41.7        26.2        52.2              22.0
+## CH Thann                    32.4        24.6        53.5              21.6
+## CH Altkirch                  0.0        16.4        26.0              17.7
+## CH Mulhouse                 16.5         0.0        31.5               4.2
+## 3Frontières                 26.0        31.2         0.0              30.4
+## Diaconat-Fonderie           17.9         3.9        31.1               0.0
+## CH Epinal                  117.0       109.2       138.2             106.2
+## CH St Dié                  121.2       104.7       121.3             102.3
+##                      CH Epinal CH St Dié
+## CHU de Nancy-Brabois      66.9      82.7
+## CHU de Nancy              68.5      84.4
+## Nancy                     70.1      86.1
+## Hôpital de Mercy         123.9     139.9
+## Metz                     125.6     141.5
+## Epinal                     1.5      50.5
+## SteAnne                  149.5      97.0
+## HTP                      144.8      92.3
+## NHC                      143.4      90.9
+## SteOdile                 142.5      90.0
+## CH Haguenau              145.5     121.2
+## CH Wissembourg           177.7     153.4
+## CH Saverne               110.7      86.5
+## CH Selestat               94.8      42.3
+## StLuc                     83.2      39.3
+## CH Colmar                 88.2      62.0
+## CH Guebwiller             97.5      81.2
+## CH Thann                  85.3      71.9
+## CH Altkirch              115.3     121.2
+## CH Mulhouse              109.9     104.2
+## 3Frontières              137.8     120.8
+## Diaconat-Fonderie        106.3     102.9
+## CH Epinal                  0.7      50.5
+## CH St Dié                 51.0       0.0</code></pre>
+<p>Distance entre HTP et le CH Haguenau:</p>
+<pre class="r"><code>source(&quot;distancier.R&quot;)
+x1 &lt;- 7.70714690 # HTP
+y1 &lt;- 48.59323950
+x2 &lt;- 7.77857800 # CH Haguenau
+y2 &lt;- 48.79733580
+req1 &lt;- paste(&quot;http://localhost:8989/route?point=&quot;, paste(y1, x1, sep=&quot;,&quot;), &quot;&amp;point=&quot;, paste(y2, x2, sep=&quot;,&quot;), &quot;&amp;locale=fr&amp;instructions=false&amp;calc_points=false&quot;,sep=&quot;&quot;)
+t &lt;- decode.temps(req1)
+round(t/(1000*60), 0)</code></pre>
+<pre><code>## time 
+##   26</code></pre>
+<pre class="r"><code>t &lt;- decode.distance(req1)
+t</code></pre>
+<pre><code>## distance 
+##    32942</code></pre>
+<p>Pour trouver des coordonnées manquantes:</p>
+<pre><code>library(&quot;ggmap&quot;)
+geocode(&quot;Nouvel Hôpital Civil&quot;)
+</code></pre>
+<p>Information from URL : <a href="http://maps.googleapis.com/maps/api/geocode/json?address=Nouvel+H%c3%b4pital+Civil&amp;sensor=false">http://maps.googleapis.com/maps/api/geocode/json?address=Nouvel+H%c3%b4pital+Civil&amp;sensor=false</a> Google Maps API Terms of Service : <a href="http://developers.google.com/maps/terms">http://developers.google.com/maps/terms</a> lon lat 1 7.742367 48.57501</p>
 
 
 </div>
