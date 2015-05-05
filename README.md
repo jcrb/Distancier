@@ -10,6 +10,7 @@ Avec OpenStreetMap
 ---------------------------------
 
 A partir de [Geofabrik](http://download.geofabrik.de/europe/france.html)on réupère les fichiers de l'Alsace et de la Lorraine (plus de 2 Go chaque une fois décompactés). Au passage on récupère également la version SHP pour une utilisation de cartographie (date de la récupération: 6/9/2014).
+Le fichier compacté à récupérer est __alsace-latest.osm.bz2__
 
 2. Merger les différents fichiers
 ---------------------------------

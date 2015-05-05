@@ -7,6 +7,8 @@ output: html_document
 
 source: http://rgeomatic.hypotheses.org/157
 
+Voir le fichier __readme.mkd__.
+
 ```{r}
 
 # librairies
