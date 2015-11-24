@@ -1,0 +1,43 @@
+---
+title: "Distancier des UNV Alsace"
+author: "JcB"
+date: "24/11/2015"
+output: html_document
+---
+
+Création d'un distancier entre les communes d'Alsace et les UNV. On utilise:
+
+- fichier des communes avec la geoloc du centre ville: __villes_alsace_gps.csv__
+- fichier des geoloc des UNV: __UNV.csv__
+- création de la matrice des temps (en mn) avec __osrmTableOD__. Cette fonction est limitée à 100 communes par appel => il faut prévoir une boucle pour toutes les faire.
+
+```{r}
+library(osrm)
+
+file1 <- "villes_alsace_gps.csv"
+file2 <- "UNV.csv"
+
+villes <- read.csv(file1)
+unv <- read.csv(file2)
+
+# Certaines ville n'ont pas de coordonnées GPS. Sur les 907 communes, il en reste 861
+villes2 <- villes[complete.cases(villes),]
+# le nombre de requêtes est limité à 100
+i <-1
+n <- nrow(villes2)
+d1 <- NULL
+while(i < n){
+    j <- 1
+    k <- 90
+    d <- osrmTableOD(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
+    d1 <- rbind(d1, d)
+    j <- k + 1
+    k <- k + 90
+    if(k > n)
+        k = n
+    i = k
+}
+write.csv(d1, file <- "distancier_unv_alsace.csv")
+
+```
+
