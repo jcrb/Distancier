@@ -5,13 +5,17 @@ date: "24/11/2015"
 output: html_document
 ---
 
+source: [cartography](https://elementr.hypotheses.org/284) sur le site [RGeomatic](http://rgeomatic.hypotheses.org/659).
+
 Création d'un distancier entre les communes d'Alsace et les UNV. On utilise:
 
 - fichier des communes avec la geoloc du centre ville: __villes_alsace_gps.csv__
 - fichier des geoloc des UNV: __UNV.csv__
 - création de la matrice des temps (en mn) avec __osrmTableOD__. Cette fonction est limitée à 100 communes par appel => il faut prévoir une boucle pour toutes les faire.
 
-```{r}
+Le fichier créé est enregistré au format _csv_ et le programme qui le crée est désactivé pour ne pas solliciter inutilement le serveur. En cas d'upgrade, il faudra le réactiver.
+
+```{}
 library(osrm)
 
 file1 <- "villes_alsace_gps.csv"
@@ -23,12 +27,14 @@ unv <- read.csv(file2)
 # Certaines ville n'ont pas de coordonnées GPS. Sur les 907 communes, il en reste 861
 villes2 <- villes[complete.cases(villes),]
 # le nombre de requêtes est limité à 100
-i <-1
+
 n <- nrow(villes2)
 d1 <- NULL
+i <- 1
+j <- 1
+k <- 90
 while(i < n){
-    j <- 1
-    k <- 90
+    
     d <- osrmTableOD(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
     d1 <- rbind(d1, d)
     j <- k + 1
@@ -37,7 +43,32 @@ while(i < n){
         k = n
     i = k
 }
+# une boucle supplémentaire pour les dernières villes
+d <- osrmTableOD(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
+d1 <- rbind(d1, d)
+
+names(d1)[1] <- "ville"
 write.csv(d1, file <- "distancier_unv_alsace.csv")
 
 ```
 
+Sélection de l'UNV la plus proche. On ajoute une colonne 'choix':
+```{r, comment=""}
+d1 <- read.csv("../distancier_unv_alsace.csv")
+names(d1)[1] <- "ville"
+
+# certaines villes sont redondantes (à cause des circonscriptions dans ville2)
+d1 <- d1[unique(d1$ville),]
+head(d1)
+
+d1$choix <- NA
+for(i in 1:nrow(d1)){d1$choix[i] = names(which.min(d1[i,2:5]))}
+
+# sans Haguenau
+d1$choix2 <- NA
+for(i in 1:nrow(d1)){d1$choix2[i] = names(which.min(d1[i, c(2, 4:5)]))}
+
+d1
+```
+
+TODO: cartographie, vérifier la liste des communes
