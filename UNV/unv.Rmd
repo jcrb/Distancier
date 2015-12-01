@@ -62,13 +62,48 @@ d1 <- d1[unique(d1$ville),]
 head(d1)
 
 d1$choix <- NA
-for(i in 1:nrow(d1)){d1$choix[i] = names(which.min(d1[i,2:5]))}
+for(i in 1:nrow(d1)){d1$choix[i] = names(which.min(d1[i,2:length(d1)]))}
 
 # sans Haguenau
 d1$choix2 <- NA
-for(i in 1:nrow(d1)){d1$choix2[i] = names(which.min(d1[i, c(2, 4:5)]))}
+for(i in 1:nrow(d1)){d1$choix2[i] = names(which.min(d1[i, c(2, 4:length(d1))]))}
 
 d1
 ```
 
-TODO: cartographie, vérifier la liste des communes
+Meileurs choix avec Haguenau
+```{r}
+table(d1$choix)
+```
+Forbach et Belfort sont un meilleur choix pour 88 communes d'Alsace
+
+Meilleur choix sans Haguenau
+```{r}
+table(d1$choix2)
+
+```
+Forbach et Belfort sont un meilleur choix pour 95 communes d'Alsace
+
+
+Cartographie
+============
+
+```{r}
+# 
+file2 <- "../UNV.csv"
+unv <- read.csv(file2)
+
+library(leaflet)
+library(magrittr)
+
+UNVmap <- leaflet() %>% 
+  addTiles() %>% 
+  # pour changer le fournisseur de fonds de carte: "Acetate.terrain", "CartoDB.Positron"
+  # addProviderTiles("Acetate.terrain") %>%
+  setView(7.707147, 48.59324, zoom = 13) %>% 
+  addMarkers(data = unv, lng = ~ X, lat = ~ Y, popup = unv$UNV)
+#   addMarkers(7.707147, 48.59324, popup = 'UNV Hautepierre') %>% 
+#   addMarkers(7.778578, 48.79734, popup = 'UNV Haguenau')
+UNVmap
+```
+
