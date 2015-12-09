@@ -13,7 +13,7 @@ Création d'un distancier entre les communes d'Alsace et les UNV. On utilise:
 - fichier des geoloc des UNV: __UNV.csv__
 - création de la matrice des temps (en mn) avec __osrmTableOD__. Cette fonction est limitée à 100 communes par appel => il faut prévoir une boucle pour toutes les faire.
 
-Le fichier créé est enregistré au format _csv_ et le programme qui le crée est désactivé pour ne pas solliciter inutilement le serveur. En cas d'upgrade, il faudra le réactiver.
+Le fichier créé est enregistré au format _csv_ (distancier_unv_alsace.csv) et le programme qui le crée est désactivé pour ne pas solliciter inutilement le serveur. En cas d'upgrade, il faudra le réactiver.
 
 ```{}
 library(osrm)
@@ -27,6 +27,8 @@ unv <- read.csv(file2)
 # Certaines ville n'ont pas de coordonnées GPS. Sur les 907 communes, il en reste 861
 villes2 <- villes[complete.cases(villes),]
 # le nombre de requêtes est limité à 100
+
+# colonne code_insee
 
 n <- nrow(villes2)
 d1 <- NULL
@@ -52,13 +54,28 @@ write.csv(d1, file <- "distancier_unv_alsace.csv")
 
 ```
 
+Communes manquantes dans le 67
+------------------------------
+```{}
+
+ [1] ANDLAU                     BALBRONN                   BOUXWILLER                 BUHL                      
+ [5] CRASTATT                   DRACHENBRONN-BIRLENBACH    EBERBACH-SELTZ             WANGENBOURG-ENGENTHAL     
+ [9] GRIESHEIM-SUR-SOUFFEL      NEUGARTHEIM-ITTLENHEIM     JETTERSWILLER              KIRRWILLER                
+[13] MULHAUSEN                  NEEWILLER-PRES-LAUTERBOURG NEUVILLER-LA-ROCHE         BETSCHDORF                
+[17] OBERHOFFEN-LES-WISSEMBOURG OBERMODERN-ZUTZENDORF      SEEBACH                    RANRUPT                   
+[21] ROPPENHEIM                 SCHARRACHBERGHEIM-IRMSTETT SCHWEIGHOUSE-SUR-MODER     SCHWENHEIM                
+[25] STUTZHEIM-OFFENHEIM        THAL-DRULINGEN             THAL-MARMOUTIER            WESTHOUSE                 
+[29] WESTHOUSE-MARMOUTIER       WICKERSHEIM-WILSHAUSEN     ZOEBERSDORF   
+
+```
+
 Sélection de l'UNV la plus proche. On ajoute une colonne 'choix':
-```{r, comment=""}
+```{r, comment="", warning = FALSE}
 d1 <- read.csv("../distancier_unv_alsace.csv")
-names(d1)[1] <- "ville"
+names(d1)[1] <- "nom_commune"
 
 # certaines villes sont redondantes (à cause des circonscriptions dans ville2)
-d1 <- d1[unique(d1$ville),]
+d1 <- d1[unique(d1$nom_commune),]
 head(d1)
 
 d1$choix <- NA
@@ -83,6 +100,49 @@ table(d1$choix2)
 
 ```
 Forbach et Belfort sont un meilleur choix pour 95 communes d'Alsace
+
+Fichier dist
+============
+
+Le fichier __dist__ resulte du merging du fichier des disances __d1__ et du fichier __villes2__ dont on ne conserve que certaines colonnes. On récupère ainsi des infos utiles comme le code INSEE de la commune.
+
+```{r}
+# on récupère le fichier des villes
+file1 <- "../villes_alsace_gps.csv"
+villes <- read.csv(file1)
+# Certaines ville n'ont pas de coordonnées GPS. Sur les 907 communes, il en reste 861
+villes2 <- villes[complete.cases(villes),]
+
+# on simplifie le fichier villes2
+ville3 <- villes2[, c("numéro_département", "nom_commune", "codes_postaux", "code_insee", "latitude", "longitude")]
+
+# merging des 2 fichiers
+dist <- merge(ville3, d1, by = "nom_commune", all.x = TRUE)
+str(dist)
+```
+
+Création d'une colonne de couleur par commune
+---------------------------------------------
+
+```{r}
+par(mar = c(0,0,2,0))
+
+load("~/Documents/Resural/Stat Resural/RPU_Doc/RPU_Carto-Pop-Alsace/Cartographie/Cartofile/carto67.Rda")
+source('~/Documents/Resural/FEDORU/Trame_Commune/Zone_chalandise/zone_chalandise.R')
+
+# Bas-rhin
+cols <- c("cornflowerblue", "yellow", "orange")
+a <- attribJoin(dist, st, "code_insee", "INSEE_COM" )
+plot(a, col = cols[as.numeric(as.factor(a$choix2))], main = "UNV la plus proche")
+legend("right", legend = c("Colmar","Forbach","Strasbourg"), col = c("cornflowerblue", "yellow", "orange"), pch = 15, bty = "n")
+
+# Haut-rhin
+load("~/Documents/Resural/Stat Resural/RPU_Doc/RPU_Carto-Pop-Alsace/Cartographie/Cartofile/carto68.Rda") # hr
+cols2 <- c("red", "cornflowerblue", "green")
+a <- attribJoin(dist, hr, "code_insee", "INSEE_COM" )
+plot(a, col = cols2[as.numeric(as.factor(a$choix2))], main = "UNV la plus proche")
+legend("right", legend = c("Belfort", "Colmar","Mulhouse"), col = cols2, pch = 15, bty = "n")
+```
 
 
 Cartographie
