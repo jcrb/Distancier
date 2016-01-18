@@ -1,16 +1,31 @@
 ---
 title: "Distancier des UNV Alsace"
-author: "JcB"
+author: "JcB & RESURAL"
 date: "24/11/2015"
-output: html_document
+output:
+  html_document:
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+always_allow_html: yes
 ---
 
-source: [cartography](https://elementr.hypotheses.org/284) sur le site [RGeomatic](http://rgeomatic.hypotheses.org/659).
+Création d'un distancier entre les communes d'Alsace et les UNV
+===============================================================
 
-Création d'un distancier entre les communes d'Alsace et les UNV. On utilise:
+Il y a quatre UNV en Alsace dans les communes de Haguenau, Strasbourg, Colmar et Mulhouse. L'UNV de Haguenau fonctionne par intermittence faute d'effectifs médicaux suffisants. 
+
+source méthodologique: [cartography](https://elementr.hypotheses.org/284) sur le site [RGeomatic](http://rgeomatic.hypotheses.org/659).
+
+Création des fichiers de base
+------------------------------
+On utilise:
 
 - fichier des communes avec la geoloc du centre ville: __villes_alsace_gps.csv__
-- fichier des geoloc des UNV: __UNV.csv__
+- fichier des geoloc des UNV: __UNV.csv__ (Alsace et Lorraine)
 - création de la matrice des temps (en mn) avec __osrmTableOD__. Cette fonction est limitée à 100 communes par appel => il faut prévoir une boucle pour toutes les faire.
 
 Le fichier créé est enregistré au format _csv_ (distancier_unv_alsace.csv) et le programme qui le crée est désactivé pour ne pas solliciter inutilement le serveur. En cas d'upgrade, il faudra le réactiver.
@@ -69,14 +84,19 @@ Communes manquantes dans le 67
 
 ```
 
-Sélection de l'UNV la plus proche. On ajoute une colonne 'choix':
-```{r, comment="", warning = FALSE}
+Sélection de l'UNV la plus proche. On ajoute une colonne 'choix'. NB: le fichier d1 (communes + temps de trajet en minutes) a été créé à l'étape précédente.
+
+Calcul des temps de trajet par commune
+--------------------------------------
+
+```{r, comment="", warning = FALSE, echo=FALSE}
+library(knitr)
 d1 <- read.csv("../distancier_unv_alsace.csv")
 names(d1)[1] <- "nom_commune"
 
 # certaines villes sont redondantes (à cause des circonscriptions dans ville2)
 d1 <- d1[unique(d1$nom_commune),]
-head(d1)
+# head(d1)
 
 d1$choix <- NA
 for(i in 1:nrow(d1)){d1$choix[i] = names(which.min(d1[i,2:length(d1)]))}
@@ -85,28 +105,41 @@ for(i in 1:nrow(d1)){d1$choix[i] = names(which.min(d1[i,2:length(d1)]))}
 d1$choix2 <- NA
 for(i in 1:nrow(d1)){d1$choix2[i] = names(which.min(d1[i, c(2, 4:length(d1))]))}
 
-d1
-```
-
-Meileurs choix avec Haguenau
-```{r}
-table(d1$choix)
-```
-Forbach et Belfort sont un meilleur choix pour 88 communes d'Alsace
-
-Meilleur choix sans Haguenau
-```{r}
-table(d1$choix2)
+# sauvegarde
+write.csv(d1, file = "Resultats/d1.csv")
 
 ```
-Forbach et Belfort sont un meilleur choix pour 95 communes d'Alsace
 
-Fichier dist
+### UNV d'Alsace (temps de trajet en minutes)
+```{r, echo=FALSE, comment=""}
+kable(d1[, 1:5], row.names = FALSE)
+```
+
+### UNV hors Alsace (temps de trajet en minutes)
+```{r, echo=FALSE, comment=""}
+kable(d1[, c(1,6:11)], row.names = FALSE)
+```
+
+
+
+Meilleurs choix avec Haguenau (choix) et sans Haguenau (choix 2)
+----------------------------------------------------------------
+
+```{r, echo=FALSE, comment="", eval=TRUE}
+
+kable(d1[, c(1, 12, 13)], row.names = FALSE)
+
+```
+
+Forbach et Belfort sont un meilleur choix pour 88 communes d'Alsace si Hagueanu est actif et un meilleur choix pour 95 communes d'Alsace si Haguenau ne fonctonne pas.
+
+
+Fichier mergé
 ============
 
 Le fichier __dist__ resulte du merging du fichier des disances __d1__ et du fichier __villes2__ dont on ne conserve que certaines colonnes. On récupère ainsi des infos utiles comme le code INSEE de la commune.
 
-```{r}
+```{r, echo=FALSE}
 # on récupère le fichier des villes
 file1 <- "../villes_alsace_gps.csv"
 villes <- read.csv(file1)
@@ -124,19 +157,30 @@ str(dist)
 Création d'une colonne de couleur par commune
 ---------------------------------------------
 
-```{r}
-par(mar = c(0,0,2,0))
+```{r, echo=FALSE, comment=""}
 
 load("~/Documents/Resural/Stat Resural/RPU_Doc/RPU_Carto-Pop-Alsace/Cartographie/Cartofile/carto67.Rda")
 source('~/Documents/Resural/FEDORU/Trame_Commune/Zone_chalandise/zone_chalandise.R')
 
+```
+
+### Cartographie du Bas-Rhin
+
+```{r, echo=FALSE, comment="", fig.height=8}
 # Bas-rhin
+par(mar = c(0,0,2,0))
 cols <- c("cornflowerblue", "yellow", "orange")
 a <- attribJoin(dist, st, "code_insee", "INSEE_COM" )
 plot(a, col = cols[as.numeric(as.factor(a$choix2))], main = "UNV la plus proche")
 legend("right", legend = c("Colmar","Forbach","Strasbourg"), col = c("cornflowerblue", "yellow", "orange"), pch = 15, bty = "n")
+```
 
+
+### Cartographie du Haut-Rhin
+
+```{r,echo=FALSE, comment="", fig.height=8}
 # Haut-rhin
+par(mar = c(0,0,2,0))
 load("~/Documents/Resural/Stat Resural/RPU_Doc/RPU_Carto-Pop-Alsace/Cartographie/Cartofile/carto68.Rda") # hr
 cols2 <- c("red", "cornflowerblue", "green")
 a <- attribJoin(dist, hr, "code_insee", "INSEE_COM" )
@@ -145,10 +189,13 @@ legend("right", legend = c("Belfort", "Colmar","Mulhouse"), col = cols2, pch = 1
 ```
 
 
+
 Cartographie
 ============
 
-```{r}
+Ulilise le fond de carte dynanmique fournit par OpenStreetMap. Ne fonctionne qu'avec une page HTML (web).
+
+```{r, echo=FALSE}
 # 
 file2 <- "../UNV.csv"
 unv <- read.csv(file2)
