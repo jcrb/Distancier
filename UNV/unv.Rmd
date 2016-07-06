@@ -52,7 +52,7 @@ j <- 1
 k <- 90
 while(i < n){
     
-    d <- osrmTableOD(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
+d <- osrmTable(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
     d1 <- rbind(d1, d)
     j <- k + 1
     k <- k + 90
@@ -61,7 +61,7 @@ while(i < n){
     i = k
 }
 # une boucle supplémentaire pour les dernières villes
-d <- osrmTableOD(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
+d <- osrmTable(villes2[j:k,], "nom_commune", xo = "longitude", yo = "latitude", dfd = unv, idd = "UNV", xd = "X", yd = "Y")
 d1 <- rbind(d1, d)
 
 names(d1)[1] <- "ville"
