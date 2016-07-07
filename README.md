@@ -15,7 +15,7 @@ Le fichier compacté à récupérer est __alsace-latest.osm.bz2__
 2. Merger les différents fichiers
 ---------------------------------
 
-On utilise l'application [Osmosis]() pour cela:
+On utilise l'application [Osmosis](http://wiki.openstreetmap.org/wiki/FR:Osmosis) pour cela:
 
 - installer osmosis
 - ouvrir une console et se placer dans le dossier cd ~/Documents/Resural/DISTANCIER
