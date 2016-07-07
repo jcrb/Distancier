@@ -1,0 +1,85 @@
+---
+title: "Distancier pour l’exercice du 12 juillet 2016"
+author: "JcB"
+date: "6 juillet 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Ce travail vise deux objectifs:
+- créer une matrice des distances entre les leix des attentats et des hôpitaux de destination.
+- appendre à utiliser la nouvelle version de la librairie __osrm__.
+
+Sources de données:
+- les lieus des attentas ont été évalus à partir de googlemap: entrée u quartier Leclerc à Illkirch, centre de 
+- les coordonnées GPS des hôpitaux sont stockées dans 
+
+```{r}
+# test
+# 
+library(osrm)
+
+path <- "../"
+file1 <- "villes_alsace_gps.csv"
+file2 <- "UNV.csv"
+villes <- read.csv(paste0(path, file1))
+unv <- read.csv(paste0(path, file2))
+villes2 <- villes[complete.cases(villes),]
+b <- villes2[sample(1:nrow(villes2), 5), c("nom_commune", "longitude", "latitude")]
+d <- osrmTable(loc = b)
+str(d)
+d$durations
+```
+
+Exercice
+```{r}
+hop <- read.csv(paste0(path, "../../Stat Resural/RPU_Doc/RPU_Carto-Pop-Alsace/Cartographie/Cartofile/Hopitaux_Alsace.csv"), stringsAsFactors = FALSE)
+
+hotzone <- data.frame("Mutzig", 7.4471626, 48.5329886)
+names(hotzone) <- c("ville","long",'lat')
+hotzone$ville <- as.character(hotzone$ville)
+hotzone[2,] <- c("Illkirch", 7.734710, 48.535121)
+hotzone$long <- as.numeric(hotzone$long)
+hotzone$lat <- as.numeric(hotzone$lat)
+
+
+hp <- hop[, c("HOPITAL", "LONG", "LAT")]
+hp$HOPITAL <- as.character(hp$HOPITAL)
+
+# distancier des hôpitaux entre eux
+d <- osrmTable(loc = hp)
+d$durations
+
+# distancier hopitaux - chantier
+d <- osrmTable(src = hotzone, dst = hp)
+t(d$durations)
+
+# enregistrement
+write.csv(round(t(d$durations)), file = "Distancier_exercice_fusillade.csv")
+
+```
+
+
+La matrice des distances/temps est caculée par la fonction __osrmTable__.
+
+
+La library osrm
+===============
+
+osrmTable
+---------
+A partir d'un liste de ponts dont on connait les coordonnées géographiques, cette fonction calcule le temps nécessaire pour se déplacer d'un point à l'autre. Cette fonction maniile des dataframes dont la structure minimale comporte 3 colonnes, obligatoirement dans cet ordre:
+
+- un nom ou un identifiant pour l'objet
+- la longitude
+- la latitude
+
+La fonction necesssite au moins 1 dataframe pour fonctionner mais peut en accepter trois:
+
+- __loc__
+- __src__
+- __dst__
+
