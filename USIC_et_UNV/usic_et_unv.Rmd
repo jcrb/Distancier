@@ -24,6 +24,8 @@ library(sp)
 
 Objectif: calculer un distancier entre les Villes RGE et les UNV et USIC (voir aussi "RPU_Carto_Pop/cartographie/hop_alsace.Rmd").
 
+La géographie régionale est souvent mal connue des opérateurs du SAMU qui se contentent de trouver une destination sur le territoire administratif. Une meilleure destination (en terme de délai) peut exister mais elle ignorée car se situe dans une région hors des limites administratives habituelles (y compris en Allemagne). Le but de ce travail est de proposer des cartes et des listes de distance entre chaque commune d'Alsace et un centre de référence.
+
 1. Récupérer les coordonnées des villes
 ---------------------------------------
 
@@ -152,6 +154,9 @@ for(i in 1:nrow(d1)){
     y = sort(x,partial=n-1)[choix]
     d1$choix3[i] = names(y)
     }
+    
+# sauvegarde de la matrice des temps et meilleur choix
+write.csv(d1, file <- "distancier_unv_alsace_meilleur_choix.csv")
 ```
 
 head(d1)
@@ -166,11 +171,11 @@ alsace <- france[france@data$CODE_DEPT %in% c("67","68"),]
 par(mar = c(0,0,2,0))
 plot(alsace)
 
-# alsace et d1 conservent le même prdre des communes, ce qui facilite l'ajout des colonnes choix au dataframe alsace.
+# alsace et d1 conservent le même ordre des communes, ce qui facilite l'ajout des colonnes choix au dataframe alsace.
 alsace@data$CHOIX1 <- d1$choix1
 plot(alsace, col = ifelse(alsace$CHOIX1 == "HTP", "red", "yellow"))
 alsace@data$CHOIX2 <- d1$choix2
-plot(alsace, col = as.numeric(as.factor(alsace$CHOIX2)) + 1, border = "gray")
+plot(alsace, col = as.numeric(as.factor(alsace$CHOIX2)) + 1, border = "gray", main = "UNV la plus proche (Haguenau exclu)")
 
 
 ```
