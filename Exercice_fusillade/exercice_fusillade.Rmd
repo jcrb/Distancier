@@ -14,7 +14,7 @@ Ce travail vise deux objectifs:
 - appendre à utiliser la nouvelle version de la librairie __osrm__.
 
 Sources de données:
-- les lieus des attentas ont été évalus à partir de googlemap: entrée u quartier Leclerc à Illkirch, centre de 
+- les lieux des attentas ont été évalués à partir de googlemap: entrée du quartier Leclerc à Illkirch, centre de Mutzig
 - les coordonnées GPS des hôpitaux sont stockées dans 
 
 ```{r}
@@ -82,4 +82,10 @@ La fonction necesssite au moins 1 dataframe pour fonctionner mais peut en accept
 - __loc__
 - __src__
 - __dst__
+
+Usage:
+```
+osrmTable(loc, src = NULL, dst = NULL)
+```
+
 
