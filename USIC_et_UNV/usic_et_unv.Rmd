@@ -156,6 +156,7 @@ for(i in 1:nrow(d1)){
     }
     
 # sauvegarde de la matrice des temps et meilleur choix
+d1 <- round(d1) # arrondi à la minute la plus proche
 write.csv(d1, file <- "distancier_unv_alsace_meilleur_choix.csv")
 ```
 
