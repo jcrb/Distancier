@@ -198,7 +198,7 @@ head(d1)
 
 Cartographie
 ------------
-```{r}
+```{r carto, fig.height=29, fig.width=20}
 #france
 load("sp_France.Rda")
 
@@ -210,7 +210,8 @@ plot(alsace)
 alsace@data$CHOIX1 <- d1$choix1
 plot(alsace, col = ifelse(alsace$CHOIX1 == "HTP", "red", "yellow"))
 alsace@data$CHOIX2 <- d1$choix2
-plot(alsace, col = as.numeric(as.factor(alsace$CHOIX2)) + 1, border = "gray", main = "UNV la plus proche (Haguenau exclu)")
+plot(alsace, col = as.numeric(as.factor(alsace$CHOIX2)) + 1, border = "white", main = "UNV la plus proche (Haguenau exclu)")
+text(coordinates(alsace), alsace@data$NOM_COM, cex = 0.5)
 
 
 ```

@@ -221,7 +221,7 @@ par(mar = c(0,0,2,0))
 plot(alsace)
 ```
 
-![](usic_et_unv_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](usic_et_unv_files/figure-html/carto-1.png)<!-- -->
 
 ```r
 # alsace et d1 conservent le même ordre des communes, ce qui facilite l'ajout des colonnes choix au dataframe alsace.
@@ -229,12 +229,13 @@ alsace@data$CHOIX1 <- d1$choix1
 plot(alsace, col = ifelse(alsace$CHOIX1 == "HTP", "red", "yellow"))
 ```
 
-![](usic_et_unv_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
+![](usic_et_unv_files/figure-html/carto-2.png)<!-- -->
 
 ```r
 alsace@data$CHOIX2 <- d1$choix2
-plot(alsace, col = as.numeric(as.factor(alsace$CHOIX2)) + 1, border = "gray", main = "UNV la plus proche (Haguenau exclu)")
+plot(alsace, col = as.numeric(as.factor(alsace$CHOIX2)) + 1, border = "white", main = "UNV la plus proche (Haguenau exclu)")
+text(coordinates(alsace), alsace@data$NOM_COM, cex = 0.5)
 ```
 
-![](usic_et_unv_files/figure-html/unnamed-chunk-4-3.png)<!-- -->
+![](usic_et_unv_files/figure-html/carto-3.png)<!-- -->
 
