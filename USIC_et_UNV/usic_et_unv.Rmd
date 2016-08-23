@@ -200,7 +200,7 @@ Cartographie
 ------------
 ```{r carto, fig.height=29, fig.width=20}
 #france
-load("sp_France.Rda")
+load("../Data/sp_France.Rda")
 
 alsace <- france[france@data$CODE_DEPT %in% c("67","68"),]
 par(mar = c(0,0,2,0))
